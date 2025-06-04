@@ -27,8 +27,6 @@ BlynkTimer timer;
 #define AP_WIFI  "VM1080293"       // AP name 
 #define AP_PASS "Omidmuhsin2015"  // AP password 
 
-
-
 TaskHandle_t TaskHandle_1;
 TaskHandle_t TaskHandle_2;
 TaskHandle_t TaskHandle_3;
@@ -69,12 +67,9 @@ unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 10000; // 10 seconds
 
-
 // display provider 
 TM1637 displayScale(CLK_PIN,DIO_PIN);
 WiFiMulti wifiMulti;  // wifi access
-
-
 
 //******************************************************************************************** Help functions *********************************************************************
 /**
@@ -241,14 +236,14 @@ void runClientRequest()
     Serial.println("");
   } 
 }
-//*********************************************************************************************** Blynk Cloud ******************************
+//************************************************************ Blynk Cloud ******************************
 
 // This function sends data to the pins (V0 and V1) of the Blynk 
 // You can add this function to send more data
 void myTimerEvent()
 {
-  Blynk.virtualWrite(V0, currentWeight); 
-  Blynk.virtualWrite(V1, counter);
+  Blynk.virtualWrite(V0, currentWeight); // send current wieght to the Blynk cloud using virtual pin 0. 
+  Blynk.virtualWrite(V1, counter); // just for testing purposes 
   if (counter > 5000)
       counter = 0; 
     else
@@ -258,9 +253,11 @@ void myTimerEvent()
 
 
 //****************************************************************************************************************************************
+
 /**
- * Task 1 is to get weight from the load cell. 
+ * @desc: Task 1:  getting weight from the load cell and store the value to the global variable. 
  */
+
 void Task1( void *pvParameters )
 {  
   while (1)
@@ -275,7 +272,7 @@ void Task1( void *pvParameters )
 }
 
 /**
- * Task2 dislpalys the current weight. 
+ *@desc  Task2: dislpalying the current weight to the LED(4 digits - 7 segment). 
  */
 void Task2( void *pvParameters )
 {  
@@ -291,7 +288,7 @@ void Task2( void *pvParameters )
 }
 
 /**
- * Task3 runs web server 
+ * Task3: runs web server to response to any requests from clients, if there is any. 
  */
 void Task3( void *pvParameters )
 {   
@@ -307,7 +304,7 @@ void Task3( void *pvParameters )
 }
 
 /**
- * Sends the current weight to the Blynk using pins V1 and V2.
+ * @desc: run Blynk over period of time.
  */
 void Task4( void *pvParameters )
 {   
@@ -333,7 +330,7 @@ void setup()
 {
   // put your setup code here, to run once:
   // conenct to the available wifi using your AP name and password. 
-  WiFi.begin(AP_WIFI,AP_PASS); // access wife 
+  WiFi.begin(AP_WIFI,AP_PASS); // access wifi
   
   // set the speed to transfer data in the serial communication. 
   Serial.begin(115200);   // speed 
@@ -346,23 +343,22 @@ void setup()
   //2- load cell setting and initilization 
    Serial.println("Initializing the scale");
    scaleReader.begin(DOUT_PIN,SCK_PIN);
-
-
+  //3- Blynk cloud details 
   Blynk.begin(BLYNK_AUTH_TOKEN, AP_WIFI, AP_PASS);
   timer.setInterval(1000L, myTimerEvent);
 
-  // create different tasks for getting weight, displaying it.
-  xTaskCreate(Task1, "get Weight", 10000, NULL, 2, &TaskHandle_1); // getting weight 
-  xTaskCreate(Task2, "Display 1", 10000,NULL, 1, &TaskHandle_2);  
-  xTaskCreate(Task3, "Web server", 10000,NULL, 1, &TaskHandle_3);
-  xTaskCreate(Task4, "Blynk Cloud", 10000,NULL,1, &TaskHandle_4);
+  //4- create different tasks for getting weight, displaying it, and sending data to the Blynk.
+  xTaskCreate(Task1, "get Weight", 10000, NULL, 2, &TaskHandle_1);  // getting weight 
+  xTaskCreate(Task2, "Display 1", 10000,NULL, 1, &TaskHandle_2);    // display weight  
+  xTaskCreate(Task3, "Web server", 10000,NULL, 1, &TaskHandle_3);   // run server 
+  xTaskCreate(Task4, "Blynk Cloud", 10000,NULL,1, &TaskHandle_4);   // send data to the Blynk cloud
 
+  // just created we may use it later. 
    semaphore = xSemaphoreCreateMutex();
    if (semaphore == NULL)
    {
        Serial.println("Semaphore could not be created!");
    }
-
    //3 start web server.
    server.begin();
   // start to measure the scale and display it. 
@@ -374,6 +370,7 @@ void setup()
 // loop forever 
 void loop() 
 {  
+  // conencting to the provided wifi 
    while(WiFi.status() != WL_CONNECTED) 
    {
       Serial.println("..... Connecting \n");
