@@ -7,7 +7,6 @@
 #include "HX711.h"     // Load cell 
 #include "soc/rtc.h"
 
-
 // Load cell reader 
 HX711 scaleReader; 
 // HX711 circuit wiring
@@ -19,8 +18,6 @@ float calibration_scale = -19749/50; // Calibration factor to estimate the
                                    // -19749 is the number I get when calibration factor was not set.
                                    // More details about this process 
                                    // is given in the documentation
-
-
 
 // Web server 
  WiFiServer server(80);
@@ -37,7 +34,6 @@ unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 10000; // 10 seconds
 
-
 //Display circuit wiring 
 #define CLK_PIN    48     // GPIO PIN 48 from the ESP32 MCU 
 #define DIO_PIN    47     // GPIO PIN 47 from the ESP32 MCU 
@@ -50,8 +46,6 @@ const long timeoutTime = 10000; // 10 seconds
 // display provider 
 TM1637 displayScale(CLK_PIN,DIO_PIN);
 WiFiMulti wifiMulti;  // wifi access
-
-
 
 //******************************************************************************************** Help functions *********************************************************************
 /**
@@ -128,9 +122,6 @@ void displayWeight(long weightVal)
     }
   
 }
-
-
-
 
 
 //*************************************************************************** Web Server ****************************************************************************
